@@ -51,8 +51,9 @@ def pcd2voxel(pcd, filter_rad=0.1, dim_size=32):
     color_volume = np.zeros((dim_size,dim_size,dim_size,3))
     for point, color in zip(pcd.points, pcd.colors):
         xi,yi,zi = (np.around(([xs, ys, zs] - point)/filter_rad)).astype(int)
-        voxel_volume[xi, yi, zi] = 1
-        color_volume[xi, yi, zi]= color
+        if (xi < dim_size and yi < dim_size and zi < dim_size):
+            voxel_volume[xi, yi, zi] = 1
+            color_volume[xi, yi, zi]= color
     
     return voxel_volume, color_volume
 
@@ -97,7 +98,7 @@ def classidvol2colorvol(classid_volume):
     return color_volume
 
 
-def viz_vvae_output(output_color_volume, output_dir, divide=True, show=True, save=False):
+def viz_vvae_output(output_color_volume, output_dir='./', divide=True, show=True, save=False):
     voxel_volume = np.zeros([32,32,32])
     voxel_volume = voxel_volume.flatten()
     color_volume = output_color_volume.reshape([-1,3])

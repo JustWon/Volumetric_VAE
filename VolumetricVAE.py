@@ -21,8 +21,7 @@ class Encoder(torch.nn.Module):
         x = self.pool3d_2(x)
         x = F.relu(self.conv3d_3(x))
         x = self.pool3d_3(x)
-
-        x = x.view(-1)
+        x = x.view(-1,2048)
         
         return x
 
@@ -30,12 +29,11 @@ class Decoder(torch.nn.Module):
     def __init__(self, _kernel_size=2,_stride=1):
         super(Decoder, self).__init__()
         self.conv3d_1 = torch.nn.Conv3d(32,64,3,1,1)
-        self.upsample_1 = torch.nn.Upsample(scale_factor=2, mode="nearest")
+        self.upsample_1 = torch.nn.Upsample(scale_factor=2, mode="trilinear")
         self.conv3d_2 = torch.nn.Conv3d(64,128,3,1,1)
-        self.upsample_2 = torch.nn.Upsample(scale_factor=2, mode="nearest")
+        self.upsample_2 = torch.nn.Upsample(scale_factor=2, mode="trilinear")
         self.conv3d_3 = torch.nn.Conv3d(128,21,3,1,1)
-        self.upsample_3 = torch.nn.Upsample(scale_factor=2, mode="nearest")
-        self.softmax = torch.nn.Softmax()
+        self.upsample_3 = torch.nn.Upsample(scale_factor=2, mode="trilinear")
 
     def forward(self, x):
         x = self.upsample_1(x)
@@ -44,11 +42,9 @@ class Decoder(torch.nn.Module):
         x = F.relu(self.conv3d_2(x))
         x = self.upsample_3(x)
         x = F.relu(self.conv3d_3(x))
-
-        x = self.softmax(x)
         
         return x
-    
+
 class VolumetricAE(torch.nn.Module):    
     def __init__(self,_kernel_size=2,_stride=1):
         super(VolumetricAE, self).__init__()
